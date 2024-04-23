@@ -1,35 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { HTMLProps, useState } from "react";
+import { MEMBERSHIP, Membership } from "./types/membership";
+import { cn } from "./utils/cn";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [selectedMembership, setSelectedMembership] =
+    useState<Membership>("BUSINESS");
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="flex flex-col gap-2">
+        {Object.entries(MEMBERSHIP).map(([key, value]) => {
+          return (
+            <MembershipCard
+              onClick={() => setSelectedMembership(key as Membership)}
+              selected={selectedMembership === (key as Membership)}
+              membershipKey={key as Membership}
+              className="max-w-[10rem]"
+            />
+          );
+        })}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <div>{MEMBERSHIP[selectedMembership].votingSubtitle}</div>
     </>
-  )
+  );
 }
 
-export default App
+interface IMembershipCard extends HTMLProps<HTMLDivElement> {
+  className?: string;
+  membershipKey: Membership;
+  selected?: boolean;
+}
+
+const MembershipCard: React.FC<IMembershipCard> = ({
+  className,
+  membershipKey,
+  selected = false,
+  ...props
+}) => {
+  return (
+    <>
+      <div
+        {...props}
+        className={cn(
+          "p-4 text-center cursor-pointer border border-black rounded-md",
+          selected ? "bg-blue-700 text-white" : "bg-gray-300",
+          className
+        )}
+      >
+        {MEMBERSHIP[membershipKey].label}
+        {selected ? (
+          <p className="text-sm mt-2">{MEMBERSHIP[membershipKey].subtitle}</p>
+        ) : null}
+      </div>
+    </>
+  );
+};
+
+export default App;
